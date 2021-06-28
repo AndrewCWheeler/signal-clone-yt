@@ -1,10 +1,16 @@
-import React, { useLayoutEffect, useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Avatar } from 'react-native-elements';
-import { SafeAreaView, TouchableOpacity } from 'react-native';
-import { StyleSheet, ScrollView, View, Text } from 'react-native';
-import CustomListItem from '../components/CustomListItem';
-import { auth, db } from '../firebase';
 import { AntDesign, SimpleLineIcons } from '@expo/vector-icons';
+import { auth, db } from '../firebase';
+import CustomListItem from '../components/CustomListItem';
 
 const HomeScreen = ({ navigation }) => {
   const [chats, setChats] = useState([]);
@@ -15,20 +21,6 @@ const HomeScreen = ({ navigation }) => {
     });
   };
 
-  useEffect(() => {
-    const unsubscribe = db.collection('chats').onSnapshot((snapshot) =>
-      setChats(
-        snapshot.docs.map((doc) => ({
-          id: doc.id,
-          data: doc.data(),
-        }))
-      )
-    );
-    return unsubscribe;
-  }, []);
-
-  console.log(chats);
-
   useLayoutEffect(() => {
     navigation.setOptions({
       title: 'Signal',
@@ -37,8 +29,14 @@ const HomeScreen = ({ navigation }) => {
       headerTintColor: 'black',
       headerLeft: () => (
         <View style={{ marginLeft: 20 }}>
-          <TouchableOpacity onPress={signOutUser} activeOpacity={0.5}>
-            <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }} />
+          <TouchableOpacity activeOpacity={0.5}>
+            <Avatar
+              onPress={signOutUser}
+              rounded
+              source={{
+                uri: auth?.currentUser?.photoURL,
+              }}
+            />
           </TouchableOpacity>
         </View>
       ),
@@ -65,6 +63,19 @@ const HomeScreen = ({ navigation }) => {
     });
   }, [navigation]);
 
+  useEffect(() => {
+    const unsubcribe = db.collection('chats').onSnapshot((snapshot) =>
+      setChats(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          data: doc.data(),
+        }))
+      )
+    );
+
+    return unsubcribe;
+  }, []);
+
   const enterChat = (id, chatName) => {
     navigation.navigate('Chat', {
       id,
@@ -74,19 +85,16 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView>
-      {chats && (
-        <ScrollView style={styles.container}>
-          {chats.map((chat) => (
-            <CustomListItem
-              key={chat.id}
-              id={chat.id}
-              chatName={chat.chatName}
-              enterChat={enterChat}
-            />
-          ))}
-          <CustomListItem />
-        </ScrollView>
-      )}
+      <ScrollView style={styles.container}>
+        {chats.map(({ id, data: { chatName } }) => (
+          <CustomListItem
+            key={id}
+            id={id}
+            chatName={chatName}
+            enterChat={enterChat}
+          />
+        ))}
+      </ScrollView>
     </SafeAreaView>
   );
 };

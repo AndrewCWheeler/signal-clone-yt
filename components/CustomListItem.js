@@ -19,12 +19,7 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
   }, []);
 
   return (
-    <ListItem
-      key={id}
-      onPress={() => enterChat(id, chatName)}
-      key={id}
-      bottomDivider
-    >
+    <ListItem key={id} onPress={() => enterChat(id, chatName)} bottomDivider>
       <Avatar
         rounded
         source={{
@@ -37,9 +32,11 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
         <ListItem.Title style={{ fontWeight: '800' }}>
           {chatName}
         </ListItem.Title>
-        <ListItem.Subtitle numberOfLines={1} ellipsizeMode='tail'>
-          {chatMessages?.[0]?.displayName}: {chatMessages?.[0]?.message}
-        </ListItem.Subtitle>
+        {chatMessages?.length > 0 && (
+          <ListItem.Subtitle numberOfLines={1} ellipsizeMode='tail'>
+            {chatMessages?.[0]?.displayName}: {chatMessages?.[0]?.message}
+          </ListItem.Subtitle>
+        )}
       </ListItem.Content>
     </ListItem>
   );
